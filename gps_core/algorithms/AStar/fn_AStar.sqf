@@ -19,8 +19,12 @@ params [
 	"_startRoute",
 	"_goalRoute",
 	"_namespace",
-	["_weightFunction", { 
-		params ["_next", "_startRoute", "_goalRoute", "_cost_so_far"];
+	["_costFunction", { 
+		params ["_base_cost", "_current", "_next", "_startRoute", "_goalRoute"];
+		_base_cost
+	}],
+	["_distanceFunction", { 
+		params ["_current", "_next", "_startRoute", "_goalRoute"];
 		_goalRoute distance _next
 	}]
 ];
@@ -47,20 +51,20 @@ for "_i" from 0 to 1 step 0 do {
 
 	{
 		_x params ["_next","_cost"];
-		_new_cost = ([_cost_so_far,RID(_current)] call misc_fnc_hashTable_find) + _cost;
+		_new_cost = ([_cost_so_far,RID(_current)] call misc_fnc_hashTable_find) + ([_cost, _current, _next, _startRoute, _goalRoute] call _costFunction);
 		if (
 			!([_cost_so_far,RID(_next)] call misc_fnc_hashTable_exists) 
 		) then {
 			_counter = _counter + 1;
 			[_cost_so_far,RID(_next),_new_cost] call misc_fnc_hashTable_set;
-			_priority = _new_cost + ([_next, _startRoute, _goalRoute, _cost_so_far] call _weightFunction);
+			_priority = _new_cost + ([_current, _next, _startRoute, _goalRoute] call _distanceFunction);
 			[_frontier,_priority,_counter,_next] call misc_fnc_PQ_insert;
 			[_came_from,RID(_next),_current] call misc_fnc_hashTable_set;
 		}else{
 			if (_new_cost < ([_cost_so_far,RID(_next)] call misc_fnc_hashTable_find)) then {
 				_counter = _counter + 1;
 				[_cost_so_far,RID(_next),_new_cost] call misc_fnc_hashTable_set;
-				_priority = _new_cost + ([_next, _startRoute, _goalRoute, _cost_so_far] call _weightFunction);
+				_priority = _new_cost + ([_current, _next, _startRoute, _goalRoute] call _distanceFunction);
 				[_frontier,_priority,_counter,_next] call misc_fnc_PQ_insert;
 				[_came_from,RID(_next),_current] call misc_fnc_hashTable_set;
 			};

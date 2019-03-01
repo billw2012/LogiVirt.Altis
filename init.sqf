@@ -41,3 +41,34 @@ fnc_gps_do = {
     // compile preprocessFileLineNumbers
     [] execVM "gps_do.sqf";
 };
+
+onMapSingleClick {
+    if (_shift) then {
+        [_pos] execVM "gps_do.sqf";
+    };
+    _shift
+};
+
+danger_markers = [];
+
+fn_randomize_danger_zones = {
+    {
+        deleteMarker _x;
+    } forEach danger_markers;
+
+    danger_markers = [];
+    for "_i" from 0 to 5 + random(10) do {
+        private _pos = [] call BIS_fnc_randomPos;
+        private _mrk = createMarker [str _pos, _pos];
+        _mrk setMarkerShape "ELLIPSE";
+        _mrk setMarkerBrush "Vertical";
+        _mrk setMarkerColor "ColorRed";
+        private _size = 1000 + random(1500);
+        _mrk setMarkerSize [_size, _size];
+        danger_markers pushBack _mrk;
+    };    
+};
+
+player addAction ["Randomize danger zones", fn_randomize_danger_zones];
+
+[] call fn_randomize_danger_zones;

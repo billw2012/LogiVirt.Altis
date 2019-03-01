@@ -10,15 +10,19 @@
 params [
 	["_startRoute",objNull,[objNull]],
 	["_goalRoute",objNull,[objNull]],
-  ["_weightFunction", { 
-		params ["_next", "_startRoute", "_goalRoute", "_cost_so_far"];
+	["_costFunction", { 
+		params ["_base_cost", "_current", "_next", "_startRoute", "_goalRoute"];
+		_base_cost
+	}],
+	["_distanceFunction", { 
+		params ["_current", "_next", "_startRoute", "_goalRoute"];
 		_goalRoute distance _next
 	}]
 ];
 
 private _start_t = time;
 diag_log format ["[generateNodePath] %1, %2", _startRoute, _goalRoute];
-private _came_from = [_startRoute,_goalRoute,gps_allCrossRoadsWithWeight,_weightFunction] call gps_core_fnc_aStar;
+private _came_from = [_startRoute,_goalRoute,gps_allCrossRoadsWithWeight,_costFunction,_distanceFunction] call gps_core_fnc_aStar;
 
 if(_came_from isEqualTo []) then { throw "PATH_NOT_FOUND_CAMEFROM" };
 diag_log format ["[generateNodePath] came_from: %1", _came_from];
