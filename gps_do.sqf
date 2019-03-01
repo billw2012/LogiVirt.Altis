@@ -30,19 +30,24 @@
     private _normal = ["ColorBlue", { 
         params ["_next", "_startRoute", "_goalRoute", "_cost_so_far"];
         _goalRoute distance _next
-    }];   
+    }];
     private _danger = ["ColorRed", { 
         params ["_next", "_startRoute", "_goalRoute", "_cost_so_far"];
         private _danger_rating = 0;
         {
-            if ((markerPos _x) distance _next < (markerSize _x) select 0) then {
-                _danger_rating = _danger_rating + 50000;
-            };
+            private _rating_cost = 0 max (((markerSize _x) select 0) - ((markerPos _x) distance _next));
+            _danger_rating = _danger_rating + _rating_cost * _rating_cost * _rating_cost;
         } forEach danger_markers;
         (_goalRoute distance _next) + _danger_rating
     }];
+    private _height = ["ColorGreen", { 
+        params ["_next", "_startRoute", "_goalRoute", "_cost_so_far"];
+        private _height = 100 * ((getPosASL _next) select 2);
+        (_goalRoute distance _next) + _height
+    }];
 
-    private _runs = [_normal, _danger];
+    //private _runs = [_normal, _danger, _height];
+    private _runs = [_height];
     // private _startPos = [] call BIS_fnc_randomPos;
     // [_startPos] call fn_mkr;
 
