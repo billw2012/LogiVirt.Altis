@@ -37,6 +37,10 @@ fnc_mapDrawLine = compile preprocessFileLineNumbers "mapDrawLine.sqf";
 
 [] execVM "gps_core\init.sqf";
 
+call compile preprocessFileLineNumbers "WarStatistics\initVariables.sqf";
+call compile preprocessFileLineNumbers "WarStatistics\initFunctions.sqf";
+call compile preprocessFileLineNumbers "WarStatistics\initVariablesServer.sqf";
+
 fnc_gps_do = {
     // compile preprocessFileLineNumbers
     [] execVM "gps_do.sqf";
@@ -51,24 +55,12 @@ onMapSingleClick {
 
 danger_markers = [];
 
-fn_randomize_danger_zones = {
-    {
-        deleteMarker _x;
-    } forEach danger_markers;
+activity_grid = [] call ws_fnc_newGridArray;
 
-    danger_markers = [];
-    for "_i" from 0 to 5 + random(10) do {
-        private _pos = [] call BIS_fnc_randomPos;
-        private _mrk = createMarker [str _pos, _pos];
-        _mrk setMarkerShape "ELLIPSE";
-        _mrk setMarkerBrush "Vertical";
-        _mrk setMarkerColor "ColorRed";
-        private _size = 1000 + random(1500);
-        _mrk setMarkerSize [_size, _size];
-        danger_markers pushBack _mrk;
-    };    
+fn_randomize_danger_zones = {
+    [] execVM "gen_activity.sqf";
 };
 
-player addAction ["Randomize danger zones", fn_randomize_danger_zones];
+player addAction ["Randomize activity", fn_randomize_danger_zones];
 
 [] call fn_randomize_danger_zones;

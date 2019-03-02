@@ -1,0 +1,39 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "test",
+            "type": "shell",
+            "command": ".\\tools\\sqf-vm\\sqfvm.exe",
+            "args": [
+                "--no-prompt",
+                "-f",
+                "${file}"
+                // Ask msbuild to generate full paths for file names.
+                // "/property:GenerateFullPaths=true",
+                // "/t:build"
+            ],
+            "group": "build",
+            "presentation": {
+                // Reveal the output only if unrecognized errors occur.
+                "reveal": "silent"
+            },
+            // Use the standard MS compiler pattern to detect errors, warnings and infos
+            "problemMatcher": //"$msCompile"
+            {
+                "owner": "sqf",
+                "fileLocation": ["absolute"],//, "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^\\[(RNT|WRN|ERR)\\]\\[(\\d+)\\|C(.*)\\|(.*)\\](.*)$",
+                    "file": 4,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 1,
+                    "message": 5
+                }
+            }
+        }
+    ]
+}

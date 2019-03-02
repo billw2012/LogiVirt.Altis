@@ -51,6 +51,7 @@ for "_i" from 0 to 1 step 0 do {
 
 	{
 		_x params ["_next","_cost"];
+		
 		_new_cost = ([_cost_so_far,RID(_current)] call misc_fnc_hashTable_find) + ([_cost, _current, _next, _startRoute, _goalRoute] call _costFunction);
 		if (
 			!([_cost_so_far,RID(_next)] call misc_fnc_hashTable_exists) 
@@ -59,6 +60,15 @@ for "_i" from 0 to 1 step 0 do {
 			[_cost_so_far,RID(_next),_new_cost] call misc_fnc_hashTable_set;
 			_priority = _new_cost + ([_current, _next, _startRoute, _goalRoute] call _distanceFunction);
 			[_frontier,_priority,_counter,_next] call misc_fnc_PQ_insert;
+			
+			[
+				["start", getPos _current],
+				["end", getPos _next],
+				["color", "ColorBlack"],
+				["size", 5],
+				["id", "astar_" + str _next]
+			] call fnc_mapDrawLine; 
+
 			[_came_from,RID(_next),_current] call misc_fnc_hashTable_set;
 		}else{
 			if (_new_cost < ([_cost_so_far,RID(_next)] call misc_fnc_hashTable_find)) then {
@@ -66,10 +76,27 @@ for "_i" from 0 to 1 step 0 do {
 				[_cost_so_far,RID(_next),_new_cost] call misc_fnc_hashTable_set;
 				_priority = _new_cost + ([_current, _next, _startRoute, _goalRoute] call _distanceFunction);
 				[_frontier,_priority,_counter,_next] call misc_fnc_PQ_insert;
+
+				[
+					["start", getPos _current],
+					["end", getPos _next],
+					["color", "ColorBlack"],
+					["size", 5],
+					["id", "astar_" + str _next]
+				] call fnc_mapDrawLine; 
+
 				[_came_from,RID(_next),_current] call misc_fnc_hashTable_set;
 			};
 		};
 	}foreach ([_namespace,RID(_current)] call misc_fnc_hashTable_find);
 };
+
+_allMarkers = allMapMarkers;
+{
+	if (toLower _x find "astar_" >= 0) then
+	{
+		deleteMarkerLocal _x;
+	};
+} forEach _allMarkers;
 
 _came_from
